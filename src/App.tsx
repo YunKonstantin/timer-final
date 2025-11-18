@@ -1,26 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { Container, Tabs, Tab, Box } from "@mui/material";
+import Timer from "./components/Timer";
+import Countdown from "./components/Countdown";
 
-function App() {
+const App: React.FC = () => {
+  const [currentTab, setCurrentTab] = useState<number>(0);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setCurrentTab(newValue);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container
+      maxWidth="md"
+      sx={{ py: 4, backgroundColor: "white", minHeight: "100vh" }}
+    >
+      <Tabs value={currentTab} onChange={handleTabChange} centered>
+        <Tab label="Секундомер" />
+        <Tab label="Таймер" />
+      </Tabs>
+
+      <Box sx={{ mt: 3 }}>
+        {currentTab === 0 && <Timer title="Секундомер" />}
+        {currentTab === 1 && <Countdown />}
+      </Box>
+    </Container>
   );
-}
+};
 
 export default App;
