@@ -27,7 +27,7 @@ const Timer: React.FC<TimerProps> = ({ title = "Секундомер", initialTi
     return `${minutes.toString().padStart(2, "0")}:${seconds
       .toString()
       .padStart(2, "0")}.${ms.toString().padStart(2, "0")}`;
-  }, []);
+  }, []);//utils перенести почитатть за рендер
 
   const displayTime = useMemo(() => formatTime(time), [time, formatTime]);
 

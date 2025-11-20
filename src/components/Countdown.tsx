@@ -8,7 +8,7 @@ import {
   ButtonGroup,
   ControlButton,
 } from "./Countdown.styles";
-import TimeInput from "./inputTime";
+import TimeInput from "./InputTime";
 
 interface TimeState {
   minutes: number;

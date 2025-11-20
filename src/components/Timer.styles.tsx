@@ -1,5 +1,5 @@
-import styled from 'styled-components';
-import { Paper, Typography } from '@mui/material';
+import styled from "styled-components";
+import { Paper, Typography } from "@mui/material";
 
 export const TimerContainer = styled(Paper)`
   padding: 32px;
@@ -11,7 +11,7 @@ export const TimerContainer = styled(Paper)`
 `;
 
 export const TimeDisplay = styled(Typography)`
-  font-family: 'Monospace', monospace;
+  font-family: "Monospace", monospace;
   font-size: 3rem;
   font-weight: bold;
   margin: 24px 0;
