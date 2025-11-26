@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import PropTypes from "prop-types";
-import { Button, } from "@mui/material";
+import { Button } from "@mui/material";
 import { PlayArrow, Pause, Replay } from "@mui/icons-material";
 import {
   TimerContainer,
@@ -14,7 +14,10 @@ interface TimerProps {
   initialTime?: number;
 }
 
-const Timer: React.FC<TimerProps> = ({ title = "Секундомер", initialTime = 0 }) => {
+const Timer: React.FC<TimerProps> = ({
+  title = "Секундомер",
+  initialTime = 0,
+}) => {
   const [time, setTime] = useState<number>(initialTime);
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [startTime, setStartTime] = useState<number>(0);
@@ -27,7 +30,7 @@ const Timer: React.FC<TimerProps> = ({ title = "Секундомер", initialTi
     return `${minutes.toString().padStart(2, "0")}:${seconds
       .toString()
       .padStart(2, "0")}.${ms.toString().padStart(2, "0")}`;
-  }, []);//utils перенести почитатть за рендер
+  }, []);
 
   const displayTime = useMemo(() => formatTime(time), [time, formatTime]);
 
@@ -48,13 +51,11 @@ const Timer: React.FC<TimerProps> = ({ title = "Секундомер", initialTi
 
   useEffect(() => {
     let intervalId: number | undefined;
-
     if (isRunning) {
       intervalId = window.setInterval(() => {
         setTime(Date.now() - startTime);
       }, 10);
     }
-
     return () => {
       if (intervalId) window.clearInterval(intervalId);
     };
@@ -73,9 +74,7 @@ const Timer: React.FC<TimerProps> = ({ title = "Секундомер", initialTi
       <Title variant="h4" gutterBottom>
         {title}
       </Title>
-
       <TimeDisplay variant="h2">{displayTime}</TimeDisplay>
-
       <ButtonGroup>
         <Button
           variant="contained"
@@ -86,7 +85,6 @@ const Timer: React.FC<TimerProps> = ({ title = "Секундомер", initialTi
         >
           {startPauseConfig.text}
         </Button>
-
         <Button
           variant="outlined"
           color="inherit"
@@ -105,6 +103,6 @@ const Timer: React.FC<TimerProps> = ({ title = "Секундомер", initialTi
 Timer.propTypes = {
   title: PropTypes.string,
   initialTime: PropTypes.number,
-};//по тз
+};
 
 export default React.memo(Timer);

@@ -1,10 +1,8 @@
-import { Typography, Alert, Box } from "@mui/material";
+import { Typography, Alert, Box, CircularProgress } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import {
   CountdownContainer,
   TimerCard,
-  TimeDisplay,
-  ProgressBar,
   ButtonGroup,
   ControlButton,
 } from "./Countdown.styles";
@@ -26,7 +24,8 @@ const Countdown: React.FC = () => {
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [isFinished, setIsFinished] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
-
+  const [error, setError] = useState<string>("");
+  const [initialTime, setInitialTime] = useState<number>(0);
   useEffect(() => {
     let intervalId: number | undefined;
     if (isRunning && remainingTime > 0) {
@@ -37,10 +36,10 @@ const Countdown: React.FC = () => {
             setIsRunning(false);
             setIsFinished(true);
             playSound();
+            setProgress(100);
             return 0;
           }
-          const newProgress =
-            ((inputTime.totalSeconds - newTime) / inputTime.totalSeconds) * 100;
+          const newProgress = ((initialTime - newTime) / initialTime) * 100;
           setProgress(newProgress);
           return newTime;
         });
@@ -49,21 +48,33 @@ const Countdown: React.FC = () => {
     return () => {
       if (intervalId) window.clearInterval(intervalId);
     };
-  }, [isRunning, remainingTime, inputTime.totalSeconds]);
+  }, [isRunning, initialTime, remainingTime]);
 
   const handleStartPause = () => {
-    if (isFinished) return;
-    if (remainingTime === 0 && !isRunning) {
+    if (inputTime.totalSeconds === 0) {
+      setError("Установите время хотя бы на 1 секунду");
+      return;
+    }
+
+    if (error) setError("");
+
+    if (isFinished) {
+      setIsFinished(false);
+      setInitialTime(inputTime.totalSeconds);
       setRemainingTime(inputTime.totalSeconds);
       setProgress(0);
+      setIsRunning(true);
+    } else if (remainingTime === inputTime.totalSeconds) {
+      setIsRunning(true);
+    } else {
+      setIsRunning(!isRunning);
     }
-    setIsRunning(!isRunning);
   };
 
   const handleReset = () => {
     setIsRunning(false);
     setIsFinished(false);
-    setRemainingTime(0);
+    setRemainingTime(inputTime.totalSeconds);
     setProgress(0);
   };
 
@@ -71,14 +82,18 @@ const Countdown: React.FC = () => {
     if (!isRunning && !isFinished) {
       setInputTime(newTime);
       setRemainingTime(newTime.totalSeconds);
+      setInitialTime(newTime.totalSeconds);
+      if (error && newTime.totalSeconds > 0) {
+        setError("");
+      }
     }
   };
 
-  const formatTime = (totalSeconds: number): string => {
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-  };
+  // const formatTime = (totalSeconds: number): string => {
+  //   const minutes = Math.floor(totalSeconds / 60);
+  //   const seconds = totalSeconds % 60;
+  //   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  // };
 
   const playSound = () => {
     const audioContext = new (window.AudioContext ||
@@ -125,12 +140,54 @@ const Countdown: React.FC = () => {
           <TimeInput
             onTimeChange={handleTimeChange}
             disabled={isRunning || isFinished}
+            currentTime={remainingTime}
+            isRunning={isRunning}
           />
+
+          {error && (
+            <Alert
+              severity="error"
+              sx={{
+                mt: 2,
+                backgroundColor: "rgba(211, 47, 47, 0.1)",
+              }}
+            >
+              {error}
+            </Alert>
+          )}
         </Box>
 
-        <TimeDisplay variant="h1">{formatTime(remainingTime)}</TimeDisplay>
-
-        <ProgressBar variant="determinate" value={progress} />
+        <Box sx={{ position: "relative", display: "inline-flex", mb: 3 }}>
+          <CircularProgress
+            variant="determinate"
+            value={progress}
+            size={200}
+            thickness={4}
+            sx={{
+              color: "white",
+            }}
+          />
+          <Box
+            sx={{
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0,
+              position: "absolute",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Typography
+              variant="h3"
+              component="div"
+              sx={{ fontWeight: "bold" }}
+            >
+              {Math.round(progress)}%
+            </Typography>
+          </Box>
+        </Box>
 
         <ButtonGroup>
           <ControlButton
@@ -143,7 +200,7 @@ const Countdown: React.FC = () => {
               },
             }}
           >
-            {isRunning ? "Пауза" : "Запуск"}
+            {isFinished ? "Перезапуск" : isRunning ? "Пауза" : "Запуск"}
           </ControlButton>
 
           <ControlButton
@@ -171,7 +228,7 @@ const Countdown: React.FC = () => {
               color: "success.main",
             }}
           >
-            Время вышло! 
+            Время вышло!
           </Alert>
         )}
       </TimerCard>
